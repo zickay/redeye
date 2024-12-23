@@ -1,0 +1,6 @@
+[build]
+builder = "python"  # This ensures Railway uses the Python build pack
+start = "python eaglefeed.py"  # Start command for your bot
+
+[env]
+TOKEN = ""  # Add any necessary environment variables here

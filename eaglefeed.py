@@ -1,8 +1,6 @@
-import os
 import random
 import time
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import chromedriver_autoinstaller
@@ -18,29 +16,24 @@ def get_user_inputs():
     max_users = int(input("Enter the maximum number of users to mimic: ").strip())
     min_time = int(input("Enter the minimum activity time (in minutes): ").strip())
     max_time = int(input("Enter the maximum activity time (in minutes): ").strip())
-    proxies_path = input("Enter the path to the proxies file: ").strip()
-    return urls, min_users, max_users, min_time, max_time, proxies_path
+    return urls, min_users, max_users, min_time, max_time
 
 def setup_chrome_driver():
-    """Automatically installs and sets up ChromeDriver."""
+    """Automatically installs and sets up ChromeDriver, connecting to Scraping Browser."""
     chromedriver_autoinstaller.install()  # Automatically installs the correct version of ChromeDriver
     options = Options()
-    options.add_argument("--headless")
+    options.add_argument("--headless")  # Run in headless mode (without opening a window)
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument(f"--user-agent={fake.user_agent()}")
-    return webdriver.Chrome(service=Service(), options=options)
+    
+    # Scraping Browser URL with embedded credentials for authentication
+    scraping_browser_url = "https://brd-customer-hl_d9cb1792-zone-scraping_browser1:x3l5ynoe0xtg@brd.superproxy.io:9515"
+    options.add_argument(f"--proxy-server={scraping_browser_url}")  # Connect via Scraping Browser URL
 
-def load_proxies(proxies_path):
-    """Load proxies from the specified file."""
-    if not os.path.exists(proxies_path):
-        raise FileNotFoundError(f"Proxies file not found at: {proxies_path}")
-    with open(proxies_path, "r") as file:
-        return [line.strip() for line in file.readlines() if line.strip()]
-
-def set_proxy(options, proxy):
-    """Configure Chrome options to use a specific proxy."""
-    options.add_argument(f"--proxy-server={proxy}")
+    # Setup ChromeDriver with options
+    driver = webdriver.Chrome(service=Service(), options=options)
+    return driver
 
 def mimic_user_activity(driver, url, activity_time):
     """Simulate user activity on the specified URL."""
@@ -60,13 +53,7 @@ def mimic_user_activity(driver, url, activity_time):
 def main():
     """Main function to execute the bot's workflow."""
     # Get user inputs
-    urls, min_users, max_users, min_time, max_time, proxies_path = get_user_inputs()
-
-    # Load proxies
-    proxies = load_proxies(proxies_path)
-    if not proxies:
-        print("No proxies found. Exiting.")
-        return
+    urls, min_users, max_users, min_time, max_time = get_user_inputs()
 
     # Randomly determine the number of users to simulate
     num_users = random.randint(min_users, max_users)
@@ -76,13 +63,7 @@ def main():
     for user in range(1, num_users + 1):
         print(f"Starting activity for user {user}...")
 
-        # Randomly assign a proxy
-        proxy = random.choice(proxies)
-        print(f"Using proxy: {proxy}")
-
-        # Setup ChromeDriver with the proxy
-        options = Options()
-        set_proxy(options, proxy)
+        # Setup ChromeDriver without needing proxies
         driver = setup_chrome_driver()
 
         try:

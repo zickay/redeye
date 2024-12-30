@@ -7,3 +7,17 @@ __pycache__/
 
 # Ignore environment variables file
 .env
+
+# Ignore ChromeDriver binaries and logs
+chromedriver/
+
+# Ignore log files
+*.log
+
+# Ignore any IDE specific files (e.g., VSCode or PyCharm)
+.vscode/
+.idea/
+
+# Ignore any temporary files
+*.swp
+*.swo

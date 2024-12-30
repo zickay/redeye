@@ -1,1 +1,1 @@
-web: python eaglefeed.py 
+worker: python eaglefeed.py
